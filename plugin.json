@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ryu.unstructured",
+  "version": "0.1.14",
+  "description": "Document parsing via the Apache-2.0 Unstructured library — the broadest-coverage `document.parse` backend, reading roughly sixty formats (PDF, the whole Office family including the legacy binary .doc/.ppt/.xls, email, EPUB, HTML, spreadsheets, and OCR over scanned images). Its distinguishing output is element-level: every fragment comes back typed (Title, NarrativeText, ListItem, Table, CodeSnippet, PageBreak), so the sidecar can emit markdown that preserves document structure instead of a flat text dump — headings stay headings and tables stay tables through chunking. The cost is install weight: `unstructured[all-docs]` is a 1-2 GB Python install, and the native tools it shells out to (poppler, tesseract, libreoffice, pandoc) are NOT pip-installable and must be present on the host. The sidecar detects each missing tool and reports it by name through the job's `error`/`missing_dependencies` fields rather than failing as an empty document. Parses run as jobs: submit returns 202 + a job_id, the caller polls.",
+  "author": {
+    "name": "Ryu",
+    "url": "https://ryuhq.com"
+  },
+  "homepage": "https://github.com/amajorai/ryu-unstructured",
+  "repository": "https://github.com/amajorai/ryu-unstructured",
+  "keywords": ["document", "parse", "pdf", "docx", "ocr", "extraction"],
+  "extensions": {
+    "com.ryuhq.ryu": {
+      "id": "@ryu/unstructured",
+      "displayName": "Unstructured"
+    }
+  }
+}
