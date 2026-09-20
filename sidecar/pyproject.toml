@@ -1,0 +1,34 @@
+[project]
+name = "ryu-unstructured-sidecar"
+version = "0.1.0"
+description = "Ryu's Core-managed Unstructured document-parsing sidecar (document.parse backend)"
+requires-python = ">=3.10"
+# Base server deps only. `unstructured` and its per-format extras are optional so
+# the process boots and answers /health + /capability on any machine — that is
+# how a user finds out WHICH native tool is missing. A missing parse dep becomes
+# a typed per-job error, never a boot crash.
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+# `pip install -e ".[all-docs]"` — the manifest's `pyproject_extra`. Broad format
+# coverage, ~1-2 GB installed (onnxruntime + layout models + torch on some
+# platforms). The native tools it shells out to (poppler, tesseract, libreoffice,
+# pandoc) are NOT pip-installable; see README.md.
+all-docs = ["unstructured[all-docs]>=0.16"]
+# Narrower, much cheaper installs for users who know their corpus.
+office = ["unstructured[docx,pptx,xlsx]>=0.16"]
+pdf = ["unstructured[pdf]>=0.16"]
+
+[project.scripts]
+ryu-unstructured = "ryu_unstructured.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ryu_unstructured"]
