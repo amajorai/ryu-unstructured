@@ -1,0 +1,11 @@
+# Python sidecar — local runtime artifacts, never committed.
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+# Scratch dirs for inline uploads, expanded archives, and dispatch links.
+uploads/
+names/

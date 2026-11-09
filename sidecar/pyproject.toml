@@ -1,0 +1,48 @@
+[project]
+name = "ryu-unstructured-sidecar"
+version = "0.1.0"
+description = "Ryu's Core-managed Unstructured document-parsing sidecar (document.parse backend)"
+requires-python = ">=3.11"
+# Base server deps only. `unstructured` and its per-format extras are optional so
+# the process boots and answers /health + /capability on any machine — that is
+# how a user finds out WHICH native tool is missing. A missing parse dep becomes
+# a typed per-job error, never a boot crash.
+dependencies = [
+    # FastAPI 0.133 is the first release that accepts Starlette 1.x; Starlette 1.3.1
+    # fixes the multipart, Range, Host/path-reconstruction, and HTTPEndpoint advisories
+    # (PYSEC-2026-161/248/249/1941/1942/1943/2280/2281) every older floor admitted.
+    "fastapi>=0.133.0",
+    "starlette>=1.3.1",
+    "uvicorn>=0.29",
+    "pydantic>=2.7.0",
+]
+
+[project.optional-dependencies]
+# `pip install -e ".[all-docs]"` — the manifest's `pyproject_extra`. Broad format
+# coverage, ~1-2 GB installed (onnxruntime + layout models + torch on some
+# platforms). The native tools it shells out to (poppler, tesseract, libreoffice,
+# pandoc) are NOT pip-installable; see README.md.
+all-docs = [
+    "unstructured[all-docs]>=0.24.1",
+    "pypdf>=6.21.4",
+    # Unstructured pins discontinued pi-heif (libheif 1.23.0, CVE-2026-120208). The sidecar
+    # shims pi_heif → pillow-heif before partition; this dep must stay on the extra.
+    "pillow-heif>=1.7.0",
+]
+# Narrower, much cheaper installs for users who know their corpus.
+office = ["unstructured[docx,pptx,xlsx]>=0.24.1"]
+pdf = [
+    "unstructured[pdf]>=0.24.1",
+    "pypdf>=6.21.4",
+    "pillow-heif>=1.7.0",
+]
+
+[project.scripts]
+ryu-unstructured = "ryu_unstructured.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ryu_unstructured"]
